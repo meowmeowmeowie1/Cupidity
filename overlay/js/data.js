@@ -26,8 +26,8 @@
     { id: 36947, en: 'Pouncing Coeurl', job: 'MNK', pos: 'flank', verify: true },
     { id: 66, en: 'Demolish', job: 'MNK', pos: 'rear', pctRule: 'nonzero' },
 
-    // Dragoon (Fang and Claw / Wheeling Thrust keep positionals until
-    // Drakesbane replaces them at level 64)
+    // Dragoon (Fang and Claw / Wheeling Thrust stay the 4th combo hit at all
+    // levels; Drakesbane at 64+ is the positional-free 5th hit)
     { id: 88, en: 'Chaos Thrust', job: 'DRG', pos: 'rear' },
     { id: 25772, en: 'Chaotic Spring', job: 'DRG', pos: 'rear' },
     { id: 3554, en: 'Fang and Claw', job: 'DRG', pos: 'flank', pctRule: 'nonzero' },
@@ -52,35 +52,16 @@
     { id: 34611, en: 'Flanksbane Fang', job: 'VPR', pos: 'flank', verify: true },
     { id: 34612, en: 'Hindsting Strike', job: 'VPR', pos: 'rear', verify: true },
     { id: 34613, en: 'Hindsbane Fang', job: 'VPR', pos: 'rear', verify: true },
+    { id: 34621, en: "Hunter's Coil", job: 'VPR', pos: 'flank', verify: true },
+    { id: 34622, en: "Swiftskin's Coil", job: 'VPR', pos: 'rear', verify: true },
   ];
 
   const STATUS = {
     TRUE_NORTH: { id: 0x4e2, en: 'True North' },
   };
 
-  /* Anticipated-positional hints: what the player is expected to need next.
-   * actions: after the player uses this, the next combo step has `pos`.
-   * statuses: while the player has this buff, the buffed finisher has `pos`.
-   * MNK and NIN stay ambiguous (both positionals live on the same form /
-   * combo step), so they fall back to showing the current sector. */
-  const ANTICIPATE = {
-    actions: [
-      { id: 7478, en: 'Jinpu', job: 'SAM', pos: 'rear' }, // → Gekko
-      { id: 7479, en: 'Shifu', job: 'SAM', pos: 'flank' }, // → Kasha
-      { id: 87, en: 'Disembowel', job: 'DRG', pos: 'rear' }, // → Chaotic Spring
-      { id: 36955, en: 'Spiral Blow', job: 'DRG', pos: 'rear', verify: true }, // → Chaotic Spring
-    ],
-    statuses: [
-      { id: 2588, en: 'Enhanced Gibbet', pos: 'flank', verify: true },
-      { id: 2589, en: 'Enhanced Gallows', pos: 'rear', verify: true },
-      { id: null, en: 'Flankstung Venom', pos: 'flank' },
-      { id: null, en: 'Flanksbane Venom', pos: 'flank' },
-      { id: null, en: 'Hindstung Venom', pos: 'rear' },
-      { id: null, en: 'Hindsbane Venom', pos: 'rear' },
-    ],
-    // An action-sourced hint goes stale if the combo is dropped.
-    actionTimeoutMs: 30000,
-  };
+  // Anticipated-positional (which one you need NEXT) lives in anticipate.js,
+  // which mirrors Avarice's per-job rules from log-trackable state.
 
   const DEFAULTS = {
     // Enemy hitbox radius is not exposed to external tools, so the radar ring
@@ -90,5 +71,5 @@
     meleeReach: 3.5,
   };
 
-  return { POSITIONAL_ACTIONS, STATUS, ANTICIPATE, DEFAULTS };
+  return { POSITIONAL_ACTIONS, STATUS, DEFAULTS };
 });

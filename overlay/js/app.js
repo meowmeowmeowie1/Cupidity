@@ -42,7 +42,7 @@
     targetId: null,
     trueNorth: false,
     trueNorthTimer: null,
-    anticipated: null, // {pos, source:'action'|'status', key, until}
+    demoAnticipated: null,
     stats: new Map(), // action name → {hit, miss}
     lastPoll: null,
     pollBusy: false,
@@ -131,19 +131,13 @@
   }
 
   // ---------- anticipated positional ----------
-  function matchHint(list, id, name) {
-    const n = String(name || '').toLowerCase();
-    return list.find((h) => (h.id != null && h.id === id) || h.en.toLowerCase() === n) || null;
-  }
+  // Mirrors Avarice's per-job rules; state is rebuilt from the player's own
+  // log lines (combo chain, gauge counters, statuses). See anticipate.js.
+  const anticipator = window.CupidityAnticipate.create();
 
   function activeAnticipated() {
-    const a = state.anticipated;
-    if (!a) return null;
-    if (a.until && Date.now() > a.until) {
-      state.anticipated = null;
-      return null;
-    }
-    return a;
+    if (state.demoAnticipated) return { pos: state.demoAnticipated };
+    return anticipator.get(Date.now(), state.targetId);
   }
 
   // ---------- positional result handling ----------
@@ -152,21 +146,10 @@
     if (!line || line.sourceId !== state.playerId) return;
     if (line.targetIndex !== null && line.targetIndex !== 0) return; // count once
 
-    const hint = matchHint(Data.ANTICIPATE.actions, line.abilityId, line.abilityName);
-    if (hint) {
-      state.anticipated = {
-        pos: hint.pos,
-        source: 'action',
-        until: Date.now() + Data.ANTICIPATE.actionTimeoutMs,
-      };
-    }
+    anticipator.onPlayerAction(line.abilityId, line.abilityName, Date.now());
 
     const action = actionIndex.find(line.abilityId, line.abilityName);
     if (!action) return;
-
-    // The awaited combo step just resolved — the hint is consumed.
-    if (state.anticipated && state.anticipated.source === 'action' && !hint)
-      state.anticipated = null;
 
     const res = Core.classifyPositional(action, line, { trueNorth: state.trueNorth });
     if (res.hit === null) return; // dodged / unresolvable
@@ -191,16 +174,16 @@
 
   function onStatusLine(fields) {
     const st = Core.parseStatusLine(fields);
-    if (!st || st.targetId !== state.playerId) return;
+    if (!st) return;
 
-    const hint = matchHint(Data.ANTICIPATE.statuses, st.effectId, st.name);
-    if (hint) {
-      const key = hint.id != null ? hint.id : hint.en;
-      if (st.gained) state.anticipated = { pos: hint.pos, source: 'status', key, until: null };
-      else if (state.anticipated && state.anticipated.source === 'status' && state.anticipated.key === key)
-        state.anticipated = null;
+    if (st.targetId === state.playerId) {
+      anticipator.onSelfStatus(st.gained, st.effectId, st.name, st.duration, Date.now());
+    } else if (st.sourceId === state.playerId) {
+      // The player's debuffs on enemies (Trick Attack / Kunai's Bane).
+      anticipator.onEnemyStatus(st.gained, st.targetId, st.effectId, st.name, st.duration, Date.now());
       return;
     }
+    if (st.targetId !== state.playerId) return;
 
     const tn = Data.STATUS.TRUE_NORTH;
     if (st.effectId !== tn.id && st.name !== tn.en) return;
@@ -338,7 +321,7 @@
     document.body.classList.add('demo');
     let t = 0;
     state.targetId = 1;
-    state.anticipated = { pos: 'rear', source: 'action', until: null };
+    state.demoAnticipated = 'rear';
     setInterval(() => {
       t += 0.05;
       const orbit = 4.5 + 3 * Math.sin(t / 3);
@@ -379,6 +362,7 @@
     window.addOverlayListener('ChangePrimaryPlayer', (msg) => {
       state.playerId = msg.charID;
       state.playerName = msg.charName;
+      anticipator.reset();
     });
 
     window.addOverlayListener('EnmityTargetData', (msg) => {
@@ -398,6 +382,7 @@
       resetStats();
       state.targetId = null;
       state.lastPoll = null;
+      anticipator.reset();
     });
 
     // OverlayPlugin lock state (embedded mode): show chrome while unlocked.

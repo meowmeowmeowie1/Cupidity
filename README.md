@@ -14,10 +14,18 @@ no plugins inside the game.
 
 ## Features
 
-- **Simple mode (default)** — just a big **REAR / FLANK / FRONT** readout
-  with the distance line and ✓/✗ hit flash. Untick *Simple mode* in ⚙ for
-  the full radar + stats view, or force a mode per overlay instance with
+- **Simple mode (default)** — just a big **REAR / FLANK** readout with the
+  distance line and ✓/✗ hit flash. Untick *Simple mode* in ⚙ for the full
+  radar + stats view, or force a mode per overlay instance with
   `?simple=1` / `?simple=0` in the URL.
+- **Anticipated positional** — the big word is the positional you need
+  *next* (green when you're standing in it), using the same per-job rules
+  as Avarice, rebuilt from log-trackable state: combo chain (SAM
+  Jinpu/Shifu, DRG combo branches, NIN Gust Slash, VPR stings), gauge
+  counters (MNK Coeurl's Fury, NIN Kazematoi), and statuses (RPR Soul
+  Reaver/Executioner + Enhanced Gibbet/Gallows, SAM Meikyo + Sen, VPR
+  venoms and the Vicewinder coil chain, NIN Trick Attack/Kunai's Bane).
+  Falls back to your current sector when nothing is anticipated.
 
 - **Live positional radar** — target-relative view with front/flank/rear
   quadrants, your position, target facing, and a max-melee range ring with

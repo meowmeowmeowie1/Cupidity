@@ -11,3 +11,4 @@ jobs:
         with:
           node-version: 20
       - run: node test/core.test.js
+      - run: node test/anticipate.test.js
