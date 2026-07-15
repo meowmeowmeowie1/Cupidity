@@ -42,6 +42,7 @@
     targetId: null,
     trueNorth: false,
     trueNorthTimer: null,
+    anticipated: null, // {pos, source:'action'|'status', key, until}
     stats: new Map(), // action name → {hit, miss}
     lastPoll: null,
     pollBusy: false,
@@ -129,13 +130,43 @@
     renderStats();
   }
 
+  // ---------- anticipated positional ----------
+  function matchHint(list, id, name) {
+    const n = String(name || '').toLowerCase();
+    return list.find((h) => (h.id != null && h.id === id) || h.en.toLowerCase() === n) || null;
+  }
+
+  function activeAnticipated() {
+    const a = state.anticipated;
+    if (!a) return null;
+    if (a.until && Date.now() > a.until) {
+      state.anticipated = null;
+      return null;
+    }
+    return a;
+  }
+
   // ---------- positional result handling ----------
   function onAbilityLine(fields) {
     const line = Core.parseAbilityLine(fields);
     if (!line || line.sourceId !== state.playerId) return;
     if (line.targetIndex !== null && line.targetIndex !== 0) return; // count once
+
+    const hint = matchHint(Data.ANTICIPATE.actions, line.abilityId, line.abilityName);
+    if (hint) {
+      state.anticipated = {
+        pos: hint.pos,
+        source: 'action',
+        until: Date.now() + Data.ANTICIPATE.actionTimeoutMs,
+      };
+    }
+
     const action = actionIndex.find(line.abilityId, line.abilityName);
     if (!action) return;
+
+    // The awaited combo step just resolved — the hint is consumed.
+    if (state.anticipated && state.anticipated.source === 'action' && !hint)
+      state.anticipated = null;
 
     const res = Core.classifyPositional(action, line, { trueNorth: state.trueNorth });
     if (res.hit === null) return; // dodged / unresolvable
@@ -161,6 +192,16 @@
   function onStatusLine(fields) {
     const st = Core.parseStatusLine(fields);
     if (!st || st.targetId !== state.playerId) return;
+
+    const hint = matchHint(Data.ANTICIPATE.statuses, st.effectId, st.name);
+    if (hint) {
+      const key = hint.id != null ? hint.id : hint.en;
+      if (st.gained) state.anticipated = { pos: hint.pos, source: 'status', key, until: null };
+      else if (state.anticipated && state.anticipated.source === 'status' && state.anticipated.key === key)
+        state.anticipated = null;
+      return;
+    }
+
     const tn = Data.STATUS.TRUE_NORTH;
     if (st.effectId !== tn.id && st.name !== tn.en) return;
     clearTimeout(state.trueNorthTimer);
@@ -202,11 +243,16 @@
 
   function renderRadar() {
     const p = state.lastPoll;
-    if (!p || !state.targetId) {
+    const hasTarget = !!(p && state.targetId);
+    // Show nothing at all without a target (topbar stays reachable on hover).
+    document.body.classList.toggle('no-target', !hasTarget);
+    if (!hasTarget) {
       radar.draw({ hasTarget: false });
-      sectorEl.textContent = 'no target';
-      sectorEl.className = 'sector';
-      rangeEl.textContent = '';
+      // Only visible while the overlay is unlocked for placement.
+      sectorEl.textContent = 'REAR';
+      sectorEl.className = 'sector want ok';
+      rangeEl.textContent = 'no target';
+      rangeEl.className = 'range';
       return;
     }
     const rel = Core.relativeAngle(p.target, p.player);
@@ -223,11 +269,23 @@
       meleeReach: config.meleeReach,
       mirror: config.mirror,
     });
-    sectorEl.textContent = sector.toUpperCase();
-    sectorEl.className = 'sector ' + sector;
+
+    // Big word: the positional you need next (green when you're standing in
+    // it, red when not). Falls back to the current sector when the next
+    // positional isn't knowable (MNK/NIN, or no combo in flight).
+    const ant = activeAnticipated();
+    if (ant) {
+      const inPos = state.trueNorth || sector === ant.pos;
+      sectorEl.textContent = ant.pos.toUpperCase();
+      sectorEl.className = 'sector want ' + (inPos ? 'ok' : 'bad');
+    } else {
+      sectorEl.textContent = sector.toUpperCase();
+      sectorEl.className = 'sector ' + sector;
+    }
+
     const edge = dist - config.hitboxRadius;
     const inMelee = dist <= config.hitboxRadius + config.meleeReach;
-    rangeEl.textContent = `${edge.toFixed(1)}y ${inMelee ? '· in melee' : '· OUT OF RANGE'}`;
+    rangeEl.textContent = `${sector} · ${edge.toFixed(1)}y ${inMelee ? '· in melee' : '· OUT OF RANGE'}`;
     rangeEl.className = 'range' + (inMelee ? '' : ' out');
   }
 
@@ -280,6 +338,7 @@
     document.body.classList.add('demo');
     let t = 0;
     state.targetId = 1;
+    state.anticipated = { pos: 'rear', source: 'action', until: null };
     setInterval(() => {
       t += 0.05;
       const orbit = 4.5 + 3 * Math.sin(t / 3);

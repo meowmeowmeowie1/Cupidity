@@ -58,6 +58,30 @@
     TRUE_NORTH: { id: 0x4e2, en: 'True North' },
   };
 
+  /* Anticipated-positional hints: what the player is expected to need next.
+   * actions: after the player uses this, the next combo step has `pos`.
+   * statuses: while the player has this buff, the buffed finisher has `pos`.
+   * MNK and NIN stay ambiguous (both positionals live on the same form /
+   * combo step), so they fall back to showing the current sector. */
+  const ANTICIPATE = {
+    actions: [
+      { id: 7478, en: 'Jinpu', job: 'SAM', pos: 'rear' }, // → Gekko
+      { id: 7479, en: 'Shifu', job: 'SAM', pos: 'flank' }, // → Kasha
+      { id: 87, en: 'Disembowel', job: 'DRG', pos: 'rear' }, // → Chaotic Spring
+      { id: 36955, en: 'Spiral Blow', job: 'DRG', pos: 'rear', verify: true }, // → Chaotic Spring
+    ],
+    statuses: [
+      { id: 2588, en: 'Enhanced Gibbet', pos: 'flank', verify: true },
+      { id: 2589, en: 'Enhanced Gallows', pos: 'rear', verify: true },
+      { id: null, en: 'Flankstung Venom', pos: 'flank' },
+      { id: null, en: 'Flanksbane Venom', pos: 'flank' },
+      { id: null, en: 'Hindstung Venom', pos: 'rear' },
+      { id: null, en: 'Hindsbane Venom', pos: 'rear' },
+    ],
+    // An action-sourced hint goes stale if the combo is dropped.
+    actionTimeoutMs: 30000,
+  };
+
   const DEFAULTS = {
     // Enemy hitbox radius is not exposed to external tools, so the radar ring
     // is configurable. 5y suits most raid bosses; small trash is ~2y.
@@ -66,5 +90,5 @@
     meleeReach: 3.5,
   };
 
-  return { POSITIONAL_ACTIONS, STATUS, DEFAULTS };
+  return { POSITIONAL_ACTIONS, STATUS, ANTICIPATE, DEFAULTS };
 });

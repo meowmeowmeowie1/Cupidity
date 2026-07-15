@@ -81,6 +81,8 @@ html, body {
 .sector.front { color: #cfd2d6; }
 .sector.flank { color: #f0a078; }
 .sector.rear { color: #cda0ff; }
+.sector.want.ok { color: #9cff9c; }
+.sector.want.bad { color: #ff7a7a; }
 .range { color: #9cff9c; }
 .range.out { color: #ff7a7a; font-weight: 700; }
 
@@ -124,6 +126,14 @@ body.simple .splash { font-size: 17px; }
 body.simple .sector { font-size: 34px; line-height: 1.1; }
 body.simple .range { font-size: 13px; }
 body.simple #status { flex-direction: column; align-items: center; gap: 0; }
+
+/* no target — show nothing (topbar/settings stay reachable on hover) */
+body.no-target #radar-wrap,
+body.no-target #status,
+body.no-target #stats,
+body.no-target #feed { display: none; }
+body.unlocked.no-target #radar-wrap,
+body.unlocked.no-target #status { display: flex; }
 
 /* unlocked / resize mode */
 #resize-hint { display: none; color: #ccc; font-size: 11px; }
