@@ -16,6 +16,7 @@
       soundOnMiss: true,
       soundOnHit: false,
       showFeed: true,
+      showFlash: true, // the on-screen "Skill ✓ / ✗" splash
     },
     (() => {
       try {
@@ -85,6 +86,7 @@
   // ---------- feedback ----------
   let splashTimer = null;
   function showSplash(text, cls) {
+    if (!config.showFlash) return;
     splashEl.textContent = text;
     splashEl.className = 'splash show ' + cls;
     clearTimeout(splashTimer);
@@ -268,6 +270,7 @@
     bindCheck('cfg-sound-miss', 'soundOnMiss');
     bindCheck('cfg-sound-hit', 'soundOnHit');
     bindCheck('cfg-feed', 'showFeed');
+    bindCheck('cfg-flash', 'showFlash');
     bindNum('cfg-hitbox', 'hitboxRadius');
     bindNum('cfg-reach', 'meleeReach');
   }
