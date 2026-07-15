@@ -9,6 +9,7 @@
   const CONFIG_KEY = 'cupidity-config-v1';
   const config = Object.assign(
     {
+      simpleMode: true, // just the REAR/FLANK/FRONT readout + hit/miss flash
       hitboxRadius: Data.DEFAULTS.hitboxRadius,
       meleeReach: Data.DEFAULTS.meleeReach,
       mirror: false,
@@ -253,6 +254,16 @@
         }
       });
     };
+    const applySimple = () => document.body.classList.toggle('simple', config.simpleMode);
+    const simpleEl = $('cfg-simple');
+    simpleEl.checked = config.simpleMode;
+    simpleEl.addEventListener('change', () => {
+      config.simpleMode = simpleEl.checked;
+      saveConfig();
+      applySimple();
+    });
+    applySimple();
+
     bindCheck('cfg-mirror', 'mirror');
     bindCheck('cfg-sound-miss', 'soundOnMiss');
     bindCheck('cfg-sound-hit', 'soundOnHit');
@@ -290,6 +301,11 @@
 
   // ---------- boot ----------
   function main() {
+    // ?simple=1 / ?simple=0 overrides the saved setting (handy for keeping
+    // two overlay instances with different modes).
+    const simpleParam = /[?&]simple=([01])/.exec(window.location.search);
+    if (simpleParam) config.simpleMode = simpleParam[1] === '1';
+
     bindConfig();
     renderStats();
 

@@ -10,9 +10,14 @@ plugin — but it never touches the game process. It is a plain web overlay for
 [cactbot](https://github.com/OverlayPlugin/cactbot): no injection, no Dalamud,
 no plugins inside the game.
 
-<p align="center"><img src="docs/demo.png" width="260" alt="Cupidity demo"></p>
+<p align="center"><img src="docs/simple.png" width="240" alt="Cupidity simple mode">&nbsp;&nbsp;<img src="docs/demo.png" width="260" alt="Cupidity full mode"></p>
 
 ## Features
+
+- **Simple mode (default)** — just a big **REAR / FLANK / FRONT** readout
+  with the distance line and ✓/✗ hit flash. Untick *Simple mode* in ⚙ for
+  the full radar + stats view, or force a mode per overlay instance with
+  `?simple=1` / `?simple=0` in the URL.
 
 - **Live positional radar** — target-relative view with front/flank/rear
   quadrants, your position, target facing, and a max-melee range ring with
