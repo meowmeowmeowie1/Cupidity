@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Cupidity — positional overlay</title>
+  <link rel="stylesheet" href="cupidity.css">
+</head>
+<body>
+  <div id="root">
+    <div id="topbar">
+      <span id="title">Cupidity</span>
+      <span id="tn-badge" title="True North active">TN</span>
+      <span class="spacer"></span>
+      <button id="btn-reset" title="Reset stats">↺</button>
+      <button id="btn-config" title="Settings">⚙</button>
+    </div>
+
+    <div id="radar-wrap">
+      <canvas id="radar" width="220" height="220"></canvas>
+      <div id="splash" class="splash"></div>
+    </div>
+
+    <div id="status">
+      <span id="sector" class="sector">no target</span>
+      <span id="range" class="range"></span>
+    </div>
+
+    <table id="stats">
+      <thead>
+        <tr><th>Action</th><th>✓</th><th>✗</th><th>%</th></tr>
+      </thead>
+      <tbody id="stats-body"></tbody>
+      <tfoot>
+        <tr><td>Total</td><td colspan="3" id="stats-total">—</td></tr>
+      </tfoot>
+    </table>
+
+    <div id="feed"></div>
+
+    <div id="config-panel">
+      <label><input type="checkbox" id="cfg-mirror"> Mirror radar left/right</label>
+      <label><input type="checkbox" id="cfg-sound-miss"> Sound on miss</label>
+      <label><input type="checkbox" id="cfg-sound-hit"> Sound on hit</label>
+      <label><input type="checkbox" id="cfg-feed"> Show event feed</label>
+      <label>Hitbox radius (y) <input type="number" id="cfg-hitbox" step="0.5" min="0.5"></label>
+      <label>Melee reach (y) <input type="number" id="cfg-reach" step="0.1" min="1"></label>
+    </div>
+
+    <div id="resize-hint">Cupidity — drag/resize, then lock the overlay</div>
+  </div>
+
+  <script src="js/overlayapi.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/radar.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
