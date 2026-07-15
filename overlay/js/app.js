@@ -254,16 +254,16 @@
     });
 
     // Big word: the positional you need next (green when you're standing in
-    // it, red when not). Falls back to the current sector when the next
-    // positional isn't knowable (MNK/NIN, or no combo in flight).
+    // it, red when not). Shown only while something IS anticipated — the
+    // current sector always lives in the small range line.
     const ant = activeAnticipated();
     if (ant) {
       const inPos = state.trueNorth || sector === ant.pos;
       sectorEl.textContent = ant.pos.toUpperCase();
       sectorEl.className = 'sector want ' + (inPos ? 'ok' : 'bad');
     } else {
-      sectorEl.textContent = sector.toUpperCase();
-      sectorEl.className = 'sector ' + sector;
+      sectorEl.textContent = '';
+      sectorEl.className = 'sector';
     }
 
     const edge = dist - config.hitboxRadius;

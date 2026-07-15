@@ -25,7 +25,8 @@ no plugins inside the game.
   counters (MNK Coeurl's Fury, NIN Kazematoi), and statuses (RPR Soul
   Reaver/Executioner + Enhanced Gibbet/Gallows, SAM Meikyo + Sen, VPR
   venoms and the Vicewinder coil chain, NIN Trick Attack/Kunai's Bane).
-  Falls back to your current sector when nothing is anticipated.
+  When nothing is anticipated the big word is hidden — your current sector
+  always shows in the small range line.
 
 - **Live positional radar** — target-relative view with front/flank/rear
   quadrants, your position, target facing, and a max-melee range ring with
