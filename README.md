@@ -40,14 +40,14 @@ no plugins inside the game.
    plugin and [OverlayPlugin](https://github.com/OverlayPlugin/OverlayPlugin)
    (the modern combined installer sets up both — same prerequisites as
    cactbot).
-2. Clone or download this repository somewhere permanent, e.g.
-   `C:\cupidity\`.
-3. In ACT: **Plugins → OverlayPlugin.dll → New** ("+" button):
+2. In ACT: **Plugins → OverlayPlugin.dll → New** ("+" button):
    - Preset: *Custom overlay*
    - Type: *MiniParse*
-   - URL: the local path to `overlay/index.html`, e.g.
-     `C:\cupidity\overlay\index.html`
-4. Position and resize the overlay while it is unlocked (it shows a dashed
+   - URL: `https://meowmeowmeowie1.github.io/Cupidity/overlay/index.html`
+
+   (Or clone the repo and use the local path to `overlay/index.html`
+   instead — works offline and with local edits.)
+3. Position and resize the overlay while it is unlocked (it shows a dashed
    outline), then lock it. Hover the overlay to reach the ⚙ settings and ↺
    stats-reset buttons.
 
