@@ -39,6 +39,7 @@
   const state = {
     playerId: null,
     playerName: null,
+    playerJob: null,
     targetId: null,
     trueNorth: false,
     trueNorthTimer: null,
@@ -210,6 +211,7 @@
       const list = (data && data.combatants) || [];
       const me = list.find((c) => c.ID === state.playerId);
       const tgt = list.find((c) => c.ID === state.targetId);
+      if (me && me.Job != null) state.playerJob = me.Job;
       state.lastPoll =
         me && tgt
           ? {
@@ -226,7 +228,9 @@
 
   function renderRadar() {
     const p = state.lastPoll;
-    const hasTarget = !!(p && state.targetId);
+    // Melee-only overlay: hide entirely on any other job.
+    const melee = state.playerJob == null || Data.MELEE_JOBS.includes(state.playerJob);
+    const hasTarget = !!(p && state.targetId) && melee;
     // Show nothing at all without a target (topbar stays reachable on hover).
     document.body.classList.toggle('no-target', !hasTarget);
     if (!hasTarget) {
@@ -362,7 +366,15 @@
     window.addOverlayListener('ChangePrimaryPlayer', (msg) => {
       state.playerId = msg.charID;
       state.playerName = msg.charName;
+      state.playerJob = null;
       anticipator.reset();
+    });
+
+    // Combo state and gauge stacks (Coeurl's Fury, Kazematoi, Sen) clear
+    // when combat ends in-game; without this reset a stale counter from the
+    // last pull mislabels the first positional of the next one.
+    window.addOverlayListener('InCombat', (msg) => {
+      if (!msg.inGameCombat) anticipator.reset();
     });
 
     window.addOverlayListener('EnmityTargetData', (msg) => {

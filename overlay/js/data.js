@@ -63,6 +63,10 @@
   // Anticipated-positional (which one you need NEXT) lives in anticipate.js,
   // which mirrors Avarice's per-job rules from log-trackable state.
 
+  // ClassJob ids of melee DPS (and their pre-jobs) — the overlay hides
+  // itself entirely on any other job.
+  const MELEE_JOBS = [2, 4, 20, 22, 29, 30, 34, 39, 41]; // PGL LNC MNK DRG ROG NIN SAM RPR VPR
+
   const DEFAULTS = {
     // Enemy hitbox radius is not exposed to external tools, so the radar ring
     // is configurable. 5y suits most raid bosses; small trash is ~2y.
@@ -71,5 +75,5 @@
     meleeReach: 3.5,
   };
 
-  return { POSITIONAL_ACTIONS, STATUS, DEFAULTS };
+  return { POSITIONAL_ACTIONS, STATUS, MELEE_JOBS, DEFAULTS };
 });
