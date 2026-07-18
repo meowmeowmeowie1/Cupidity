@@ -127,6 +127,10 @@ body.simple .sector { font-size: 34px; line-height: 1.1; }
 body.simple .range { font-size: 13px; }
 body.simple #status { flex-direction: column; align-items: center; gap: 0; }
 
+/* nothing anticipated — the status area (big word + range line) hides too */
+body.no-ant #status { display: none; }
+body.unlocked.no-ant #status { display: flex; }
+
 /* no target — show nothing (topbar/settings stay reachable on hover) */
 body.no-target #radar-wrap,
 body.no-target #status,

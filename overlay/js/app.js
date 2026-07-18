@@ -211,7 +211,8 @@
       const list = (data && data.combatants) || [];
       const me = list.find((c) => c.ID === state.playerId);
       const tgt = list.find((c) => c.ID === state.targetId);
-      if (me && me.Job != null) state.playerJob = me.Job;
+      const job = me == null ? null : me.Job != null ? me.Job : me.job;
+      if (job != null) state.playerJob = Number(job);
       state.lastPoll =
         me && tgt
           ? {
@@ -228,8 +229,9 @@
 
   function renderRadar() {
     const p = state.lastPoll;
-    // Melee-only overlay: hide entirely on any other job.
-    const melee = state.playerJob == null || Data.MELEE_JOBS.includes(state.playerJob);
+    // Melee-only overlay: hide until the job is confirmed melee (unknown
+    // job counts as hidden, so nothing flashes on casters/healers/tanks).
+    const melee = state.playerJob != null && Data.MELEE_JOBS.includes(state.playerJob);
     const hasTarget = !!(p && state.targetId) && melee;
     // Show nothing at all without a target (topbar stays reachable on hover).
     document.body.classList.toggle('no-target', !hasTarget);
@@ -261,6 +263,9 @@
     // it, red when not). Shown only while something IS anticipated — the
     // current sector always lives in the small range line.
     const ant = activeAnticipated();
+    // Nothing anticipated → the whole status area (big word AND the small
+    // sector/range line) stays hidden.
+    document.body.classList.toggle('no-ant', !ant);
     if (ant) {
       const inPos = state.trueNorth || sector === ant.pos;
       sectorEl.textContent = ant.pos.toUpperCase();
@@ -325,6 +330,7 @@
     document.body.classList.add('demo');
     let t = 0;
     state.targetId = 1;
+    state.playerJob = 20; // MNK, so the melee gate passes in demo
     state.demoAnticipated = 'rear';
     setInterval(() => {
       t += 0.05;
